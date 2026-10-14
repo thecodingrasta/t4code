@@ -1070,7 +1070,9 @@ export const terminateWindowsProcessTreeWithTaskkill = (
     Effect.gen(function* () {
       const spawner = yield* ChildProcessSpawner.ChildProcessSpawner;
       const taskkill = yield* spawner.spawn(
-        ChildProcess.make("taskkill", ["/PID", String(pid), "/T", "/F"]),
+        ChildProcess.make("taskkill", ["/PID", String(pid), "/T", "/F"], {
+          windowsHide: true,
+        }),
       );
       const outputFiber = yield* Stream.decodeText(taskkill.all).pipe(
         Stream.mkString,
@@ -1605,6 +1607,7 @@ export const make = (
             ? {}
             : { detached: options.ownDetachedProcessGroup }),
           shell: containedSpawnCommand.shell,
+          windowsHide: true,
         }),
       )
       .pipe(

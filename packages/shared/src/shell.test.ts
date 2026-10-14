@@ -234,7 +234,7 @@ describe("readEnvironmentFromWindowsShell", () => {
     expect(execFile).toHaveBeenCalledWith(
       "pwsh.exe",
       expect.arrayContaining(["-NoLogo", "-NoProfile", "-NonInteractive", "-Command"]),
-      { encoding: "utf8", timeout: 5000 },
+      { encoding: "utf8", timeout: 5000, windowsHide: true },
     );
   });
 
@@ -243,7 +243,7 @@ describe("readEnvironmentFromWindowsShell", () => {
       (
         file: string,
         args: ReadonlyArray<string>,
-        options: { encoding: "utf8"; timeout: number },
+        options: { encoding: "utf8"; timeout: number; windowsHide?: boolean },
       ) => string
     >(
       () =>
@@ -260,7 +260,7 @@ describe("readEnvironmentFromWindowsShell", () => {
       (
         file: string,
         args: ReadonlyArray<string>,
-        options: { encoding: "utf8"; timeout: number },
+        options: { encoding: "utf8"; timeout: number; windowsHide?: boolean },
       ) => string
     >(() => "__T3CODE_ENV_PATH_START__\nC:\\Tools\n__T3CODE_ENV_PATH_END__\n");
 
@@ -270,7 +270,7 @@ describe("readEnvironmentFromWindowsShell", () => {
     expect(execFile).toHaveBeenCalledWith(
       "pwsh.exe",
       expect.arrayContaining(["-NoLogo", "-NonInteractive", "-Command"]),
-      { encoding: "utf8", timeout: 5000 },
+      { encoding: "utf8", timeout: 5000, windowsHide: true },
     );
     expect(execFile.mock.calls[0]?.[1]).not.toContain("-NoProfile");
   });
@@ -280,7 +280,7 @@ describe("readEnvironmentFromWindowsShell", () => {
       (
         file: string,
         args: ReadonlyArray<string>,
-        options: { encoding: "utf8"; timeout: number },
+        options: { encoding: "utf8"; timeout: number; windowsHide?: boolean },
       ) => string
     >((file) => {
       if (file === "pwsh.exe") {
@@ -295,10 +295,12 @@ describe("readEnvironmentFromWindowsShell", () => {
     expect(execFile).toHaveBeenNthCalledWith(1, "pwsh.exe", expect.any(Array), {
       encoding: "utf8",
       timeout: 5000,
+      windowsHide: true,
     });
     expect(execFile).toHaveBeenNthCalledWith(2, "powershell.exe", expect.any(Array), {
       encoding: "utf8",
       timeout: 5000,
+      windowsHide: true,
     });
   });
 });
@@ -346,9 +348,14 @@ describe("resolveKnownWindowsCliDirs", () => {
       "C:\\Users\\testuser\\AppData\\Local\\Programs\\nodejs",
       "C:\\Users\\testuser\\AppData\\Local\\Volta\\bin",
       "C:\\Users\\testuser\\AppData\\Local\\pnpm",
+      "C:\\Users\\testuser\\AppData\\Local\\vite-plus\\bin",
       "C:\\Users\\testuser\\.local\\bin",
       "C:\\Users\\testuser\\.bun\\bin",
       "C:\\Users\\testuser\\scoop\\shims",
+      "C:\\Users\\testuser\\.cargo\\bin",
+      "C:\\Users\\testuser\\AppData\\Local\\agy\\bin",
+      "C:\\Users\\testuser\\AppData\\Local\\Microsoft\\WinGet\\Links",
+      "C:\\Users\\testuser\\AppData\\Roaming\\Antigravity\\bin",
     ]);
   });
 });
@@ -850,9 +857,14 @@ effectIt.layer(NodeServices.layer)("resolveWindowsEnvironment", (it) => {
           "C:\\Users\\testuser\\AppData\\Local\\Programs\\nodejs",
           "C:\\Users\\testuser\\AppData\\Local\\Volta\\bin",
           "C:\\Users\\testuser\\AppData\\Local\\pnpm",
+          "C:\\Users\\testuser\\AppData\\Local\\vite-plus\\bin",
           "C:\\Users\\testuser\\.local\\bin",
           "C:\\Users\\testuser\\.bun\\bin",
           "C:\\Users\\testuser\\scoop\\shims",
+          "C:\\Users\\testuser\\.cargo\\bin",
+          "C:\\Users\\testuser\\AppData\\Local\\agy\\bin",
+          "C:\\Users\\testuser\\AppData\\Local\\Microsoft\\WinGet\\Links",
+          "C:\\Users\\testuser\\AppData\\Roaming\\Antigravity\\bin",
         ].join(";"),
       });
       expect(readEnvironment).toHaveBeenCalledTimes(1);
@@ -898,9 +910,14 @@ effectIt.layer(NodeServices.layer)("resolveWindowsEnvironment", (it) => {
           "C:\\Users\\testuser\\AppData\\Local\\Programs\\nodejs",
           "C:\\Users\\testuser\\AppData\\Local\\Volta\\bin",
           "C:\\Users\\testuser\\AppData\\Local\\pnpm",
+          "C:\\Users\\testuser\\AppData\\Local\\vite-plus\\bin",
           "C:\\Users\\testuser\\.local\\bin",
           "C:\\Users\\testuser\\.bun\\bin",
           "C:\\Users\\testuser\\scoop\\shims",
+          "C:\\Users\\testuser\\.cargo\\bin",
+          "C:\\Users\\testuser\\AppData\\Local\\agy\\bin",
+          "C:\\Users\\testuser\\AppData\\Local\\Microsoft\\WinGet\\Links",
+          "C:\\Users\\testuser\\AppData\\Roaming\\Antigravity\\bin",
         ].join(";"),
         FNM_DIR: "C:\\Users\\testuser\\AppData\\Roaming\\fnm",
         FNM_MULTISHELL_PATH: "C:\\Users\\testuser\\AppData\\Local\\fnm_multishells\\123",
@@ -942,6 +959,8 @@ effectIt.layer(NodeServices.layer)("resolveWindowsEnvironment", (it) => {
           "C:\\Users\\testuser\\.local\\bin",
           "C:\\Users\\testuser\\.bun\\bin",
           "C:\\Users\\testuser\\scoop\\shims",
+          "C:\\Users\\testuser\\.cargo\\bin",
+          "C:\\Users\\testuser\\AppData\\Roaming\\Antigravity\\bin",
         ].join(";"),
         FNM_DIR: "C:\\Users\\testuser\\AppData\\Roaming\\fnm",
       });
